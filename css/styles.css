@@ -334,14 +334,16 @@ button, input, textarea, select { font: inherit; }
   position: relative;
   border-radius: 28px;
   overflow: hidden;
-  min-height: 460px;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
   background: #111;
 }
 .feature-frame img {
-  width: 100%;
-  height: 520px;
-  object-fit: cover;
-  object-position: center 20%;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 .feature-frame figcaption {
   position: absolute;
@@ -457,7 +459,7 @@ button, input, textarea, select { font: inherit; }
   display: flex;
   flex-direction: column;
 }
-.card img { width: 100%; height: 220px; object-fit: cover; object-position: center 15%; }
+.card img { width: 100%; height: auto; object-fit: contain; }
 .card-body { padding: 22px 22px 8px; }
 .kicker {
   color: #666;
@@ -484,7 +486,7 @@ button, input, textarea, select { font: inherit; }
   overflow: hidden;
   background: #fff;
 }
-.help-card img { width: 100%; height: 240px; object-fit: cover; object-position: center 18%; }
+.help-card img { width: 100%; height: auto; object-fit: contain; }
 .help-card div { padding: 18px 18px 22px; }
 .help-card p { margin: 0 0 14px; }
 .text-link { font-weight: 700; color: var(--blue); text-decoration: none; }
@@ -498,7 +500,7 @@ button, input, textarea, select { font: inherit; }
   gap: 40px;
   align-items: center;
 }
-.meet-grid img { width: 100%; border-radius: 8px; object-fit: cover; aspect-ratio: 4 / 5; object-position: center 15%; }
+.meet-grid img { width: 100%; height: auto; border-radius: 8px; object-fit: contain; }
 .meet h2 { text-align: left; }
 .assoc { text-align: center; padding-top: 10px; }
 .assoc h2 { font-family: var(--display); font-weight: 500; letter-spacing: -0.03em; font-size: clamp(32px, 4vw, 42px); }
@@ -600,7 +602,7 @@ textarea { min-height: 120px; resize: vertical; }
   gap: 28px;
   align-items: start;
 }
-.split img { width: 100%; border-radius: 8px; object-fit: cover; }
+.split img { width: 100%; height: auto; border-radius: 8px; object-fit: contain; }
 .prose { max-width: var(--story); }
 .prose p { margin: 0 0 16px; }
 .pull {
