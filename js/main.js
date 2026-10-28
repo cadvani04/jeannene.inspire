@@ -49,6 +49,57 @@
     setInterval(function () { show((index + 1) % cards.length); }, 7000);
   });
 
+  var infoDialog = document.createElement("dialog");
+  infoDialog.className = "info-dialog";
+  infoDialog.id = "infoDialog";
+  infoDialog.innerHTML =
+    '<button type="button" class="info-close" aria-label="Close">×</button>' +
+    '<p class="kicker">Information</p>' +
+    '<h2>Take care of people, and the sales follow.</h2>' +
+    '<p>Jeannene Meisman helps young professionals increase their sales by teaching them how to build loyal clients through real customer service.</p>' +
+    '<ul>' +
+    '<li>Speaking for a chapter, a company, or a room that has to sell.</li>' +
+    '<li>Mentoring for one younger person, on the account they are working.</li>' +
+    '<li>Workshops and classes built around the work in front of the group.</li>' +
+    '</ul>' +
+    '<p>Clients stay because they say, “You take good care of me.” She is in Florida. Instagram is @jeanneneym.</p>' +
+    '<a class="btn" href="contact.html">Work with Jeannene</a>';
+  document.body.appendChild(infoDialog);
+
+  function openInfo() {
+    if (typeof infoDialog.showModal === "function") infoDialog.showModal();
+    else infoDialog.setAttribute("open", "");
+  }
+  function closeInfo() {
+    if (typeof infoDialog.close === "function") infoDialog.close();
+    else infoDialog.removeAttribute("open");
+  }
+
+  if (links) {
+    var infoItem = document.createElement("li");
+    var infoButton = document.createElement("button");
+    infoButton.type = "button";
+    infoButton.className = "info-open";
+    infoButton.textContent = "Information";
+    infoButton.addEventListener("click", function () {
+      links.classList.remove("open");
+      if (menuBtn) {
+        menuBtn.setAttribute("aria-expanded", "false");
+        menuBtn.setAttribute("aria-label", "Open menu");
+      }
+      openInfo();
+    });
+    infoItem.appendChild(infoButton);
+    var contactItem = links.querySelector(".nav-contact");
+    if (contactItem && contactItem.parentElement) links.insertBefore(infoItem, contactItem.parentElement);
+    else links.appendChild(infoItem);
+  }
+
+  infoDialog.querySelector(".info-close").addEventListener("click", closeInfo);
+  infoDialog.addEventListener("click", function (event) {
+    if (event.target === infoDialog) closeInfo();
+  });
+
   document.querySelectorAll("form[data-form]").forEach(function (form) {
     form.addEventListener("submit", function (event) {
       event.preventDefault();
