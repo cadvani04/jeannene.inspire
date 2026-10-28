@@ -128,6 +128,33 @@ button, input, textarea, select { font: inherit; }
   cursor: pointer;
 }
 .nav-links .info-open:hover { color: var(--yellow); }
+.nav-links .nav-signin {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 500;
+  padding: 10px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.nav-links .nav-signin:hover { color: var(--yellow); }
+.nav-signin svg { display: block; flex: none; }
+.signin-lock {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #111;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  margin-bottom: 14px;
+}
+.signin-dialog form { margin-top: 8px; }
+.signin-dialog .btn { color: #111; margin-top: 4px; }
 .nav-contact {
   flex: none;
   border: 1.5px solid #fff;
@@ -630,7 +657,8 @@ textarea { min-height: 120px; resize: vertical; }
     margin: 0;
   }
   .nav-links.open a,
-  .nav-links.open .info-open { display: block; width: 100%; text-align: left; padding: 12px 22px; }
+  .nav-links.open .info-open,
+  .nav-links.open .nav-signin { display: flex; width: 100%; text-align: left; padding: 12px 22px; }
   .sub { position: static; display: block; background: transparent; box-shadow: none; padding: 0 0 0 12px; }
   .sub a { color: #fff; }
   .nav-links.open .nav-contact, .nav-links.open .nav-ig { display: inline-flex; margin: 10px 22px; }
