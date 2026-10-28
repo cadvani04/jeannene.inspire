@@ -105,51 +105,74 @@
   signinDialog.id = "signinDialog";
   var lockClosed = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
   var lockOpen = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.2-2.4"/></svg>';
+  var passwordHash = "2b83f87fb1399cb03c7e4a95c258e5e68c5aa8052a189b653b9078a15e65162d";
   signinDialog.innerHTML =
     '<button type="button" class="info-close" aria-label="Close">×</button>' +
     '<div class="signin-lock">' + lockClosed + '</div>' +
     '<p class="kicker">Sign in</p>' +
-    '<h2>This page is locked.</h2>' +
-    '<p class="signin-lead">Enter your email and password.</p>' +
+    '<h2>This site is locked.</h2>' +
+    '<p class="signin-lead">Enter your email and the password to see the site.</p>' +
     '<form>' +
     '<label>Email<input type="email" name="email" required autocomplete="username"></label>' +
-    '<label>Password<input type="password" name="password" required minlength="4" autocomplete="current-password"></label>' +
+    '<label>Password<input type="password" name="password" required autocomplete="current-password"></label>' +
+    '<p class="signin-error" role="alert"></p>' +
     '<button class="btn" type="submit">Sign in</button>' +
     '</form>' +
     '<p class="form-success"></p>';
   document.body.appendChild(signinDialog);
 
-  var signinKey = "jeannene-signin";
+  var gateKey = "jeannene-gate";
+  var emailKey = "jeannene-signin";
   var signinButton = document.createElement("button");
   signinButton.type = "button";
   signinButton.className = "nav-signin";
 
+  function isUnlocked() {
+    try { return sessionStorage.getItem(gateKey) === "ok"; }
+    catch (err) { return false; }
+  }
   function signedInEmail() {
-    try { return sessionStorage.getItem(signinKey) || ""; }
+    try { return sessionStorage.getItem(emailKey) || ""; }
     catch (err) { return ""; }
+  }
+  function hashPassword(text) {
+    var data = new TextEncoder().encode(text);
+    return crypto.subtle.digest("SHA-256", data).then(function (buf) {
+      return Array.prototype.map.call(new Uint8Array(buf), function (b) {
+        return ("0" + b.toString(16)).slice(-2);
+      }).join("");
+    });
   }
 
   function paintSignin() {
-    var email = signedInEmail();
+    var open = isUnlocked();
     var lock = signinDialog.querySelector(".signin-lock");
     var lead = signinDialog.querySelector(".signin-lead");
     var form = signinDialog.querySelector("form");
     var success = signinDialog.querySelector(".form-success");
-    if (email) {
+    var closeBtn = signinDialog.querySelector(".info-close");
+    document.body.classList.toggle("site-locked", !open);
+    ["header", "main", "footer"].forEach(function (tag) {
+      var el = document.querySelector(tag);
+      if (!el) return;
+      if (open) el.removeAttribute("inert");
+      else el.setAttribute("inert", "");
+    });
+    closeBtn.hidden = !open;
+    if (open) {
       signinButton.innerHTML = lockOpen + "Signed in";
       lock.innerHTML = lockOpen;
       signinDialog.querySelector("h2").textContent = "You're signed in.";
-      lead.textContent = email;
+      lead.textContent = signedInEmail();
       form.hidden = true;
       success.className = "form-success show";
       success.innerHTML = '<button class="btn" type="button" data-signout>Sign out</button>';
     } else {
       signinButton.innerHTML = lockClosed + "Sign in";
       lock.innerHTML = lockClosed;
-      signinDialog.querySelector("h2").textContent = "This page is locked.";
-      lead.textContent = "Enter your email and password.";
+      signinDialog.querySelector("h2").textContent = "This site is locked.";
+      lead.textContent = "Enter your email and the password to see the site.";
       form.hidden = false;
-      form.reset();
       success.className = "form-success";
       success.textContent = "";
     }
@@ -166,10 +189,12 @@
     closeMenu();
     closeInfo();
     paintSignin();
+    if (signinDialog.open) return;
     if (typeof signinDialog.showModal === "function") signinDialog.showModal();
     else signinDialog.setAttribute("open", "");
   }
   function closeSignin() {
+    if (!isUnlocked()) return;
     if (typeof signinDialog.close === "function") signinDialog.close();
     else signinDialog.removeAttribute("open");
   }
@@ -183,26 +208,43 @@
     else links.appendChild(signinItem);
   }
   paintSignin();
+  if (!isUnlocked()) openSignin();
 
+  signinDialog.addEventListener("cancel", function (event) { event.preventDefault(); });
   signinDialog.querySelector(".info-close").addEventListener("click", closeSignin);
   signinDialog.addEventListener("click", function (event) {
     if (event.target === signinDialog) closeSignin();
     if (event.target && event.target.closest && event.target.closest("[data-signout]")) {
-      try { sessionStorage.removeItem(signinKey); } catch (err) {}
+      try {
+        sessionStorage.removeItem(gateKey);
+        sessionStorage.removeItem(emailKey);
+      } catch (err) {}
       paintSignin();
-      closeSignin();
+      openSignin();
     }
   });
   signinDialog.querySelector("form").addEventListener("submit", function (event) {
     event.preventDefault();
     var form = event.currentTarget;
+    var error = form.querySelector(".signin-error");
     if (!form.checkValidity()) {
       form.reportValidity();
       return;
     }
-    var email = form.elements.email.value.trim();
-    try { sessionStorage.setItem(signinKey, email); } catch (err) {}
-    paintSignin();
+    hashPassword(form.elements.password.value).then(function (hash) {
+      if (hash !== passwordHash) {
+        error.textContent = "That password is not right.";
+        return;
+      }
+      error.textContent = "";
+      try {
+        sessionStorage.setItem(gateKey, "ok");
+        sessionStorage.setItem(emailKey, form.elements.email.value.trim());
+      } catch (err) {}
+      form.reset();
+      paintSignin();
+      closeSignin();
+    });
   });
 
   document.querySelectorAll("form[data-form]").forEach(function (form) {

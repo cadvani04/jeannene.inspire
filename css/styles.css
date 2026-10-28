@@ -155,6 +155,9 @@ button, input, textarea, select { font: inherit; }
 }
 .signin-dialog form { margin-top: 8px; }
 .signin-dialog .btn { color: #111; margin-top: 4px; }
+.signin-error { color: #9d1c1c; font-weight: 700; margin: 0 0 10px; min-height: 1.2em; }
+body.site-locked { overflow: hidden; }
+body.site-locked .signin-dialog::backdrop { background: #111; }
 .nav-contact {
   flex: none;
   border: 1.5px solid #fff;
